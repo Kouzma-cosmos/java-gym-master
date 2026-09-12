@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class TimetableTest {
 
     @Test
@@ -18,8 +21,13 @@ public class TimetableTest {
 
         timetable.addNewTrainingSession(singleTrainingSession);
 
-        //Проверить, что за понедельник вернулось одно занятие
-        //Проверить, что за вторник не вернулось занятий
+        Collection<?> mondaySessions = timetable.getTrainingSessionsForDay(DayOfWeek.MONDAY);
+        assertEquals(1, mondaySessions.size(),
+                "В понедельник должна быть ровно 1 тренировка");
+
+        Collection<?> tuesdaySessions = timetable.getTrainingSessionsForDay(DayOfWeek.TUESDAY);
+        assertTrue(tuesdaySessions.isEmpty(),
+                "Во вторник расписание должно быть пустым");
     }
 
     @Test
@@ -46,9 +54,28 @@ public class TimetableTest {
         timetable.addNewTrainingSession(thursdayChildTrainingSession);
         timetable.addNewTrainingSession(saturdayChildTrainingSession);
 
-        // Проверить, что за понедельник вернулось одно занятие
-        // Проверить, что за четверг вернулось два занятия в правильном порядке: сначала в 13:00, потом в 20:00
-        // Проверить, что за вторник не вернулось занятий
+        Collection<List<TrainingSession>> mondaySessions = timetable.getTrainingSessionsForDay(DayOfWeek.MONDAY);
+        assertEquals(1, mondaySessions.size(), "В понедельник должно быть 1 занятие");
+
+        Collection<List<TrainingSession>> thursdaySessions = timetable.getTrainingSessionsForDay(DayOfWeek.THURSDAY);
+       assertEquals(2, thursdaySessions.size(), "В четверг должно быть 2 занятия");
+
+        List<TrainingSession> thursdayList = new ArrayList<>();
+
+        for (List<TrainingSession> hourList : thursdaySessions) {
+            thursdayList.addAll(hourList);
+        }
+
+
+        assertEquals(thursdayChildTrainingSession, thursdayList.get(0),
+                "Первой должна идти дневная тренировка в 13:00");
+
+        assertEquals(thursdayAdultTrainingSession, thursdayList.get(1),
+                "Второй должна идти вечерняя тренировка в 20:00");
+
+        Collection<List<TrainingSession>> tuesdaySessions = timetable.getTrainingSessionsForDay(DayOfWeek.TUESDAY);
+        assertTrue(tuesdaySessions.isEmpty(), "Во вторник должно быть пусто");
+
     }
 
     @Test
@@ -62,8 +89,16 @@ public class TimetableTest {
 
         timetable.addNewTrainingSession(singleTrainingSession);
 
-        //Проверить, что за понедельник в 13:00 вернулось одно занятие
-        //Проверить, что за понедельник в 14:00 не вернулось занятий
+        List<TrainingSession> monday13Sessions = timetable.getTrainingSessionsForDayAndTime(DayOfWeek.MONDAY, new TimeOfDay(13, 0));
+        assertEquals(1, monday13Sessions.size(),
+                "В понедельник в 13:00 должна быть ровно 1 тренировка");
+        assertEquals(singleTrainingSession, monday13Sessions.get(0),
+                "Вернувшееся занятие должно совпадать с добавленным");
+
+        List<TrainingSession> monday14Sessions = timetable.getTrainingSessionsForDayAndTime(DayOfWeek.MONDAY, new TimeOfDay(14, 0));
+        assertTrue(monday14Sessions.isEmpty(),
+                "В понедельник в 14:00 расписание должно быть пустым");
+
     }
 
 }
