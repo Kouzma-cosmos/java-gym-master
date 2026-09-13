@@ -53,4 +53,43 @@ public class Timetable {
         }
         return sessions;
     }
+
+    public List<Coach> getCoachActivity() {
+
+        Map<Coach, Integer> coachCounts = new HashMap<>();
+
+        for (TreeMap<TimeOfDay, List<TrainingSession>> dayTree : timetable.values()) {
+
+            for (List<TrainingSession> hourList : dayTree.values()) {
+
+                for (TrainingSession session : hourList) {
+                    Coach coach = session.getCoach();
+
+                    if (coachCounts.containsKey(coach)) {
+                        int currentCount = coachCounts.get(coach);
+                        coachCounts.put(coach, currentCount + 1);
+                    } else {
+                        coachCounts.put(coach, 1);
+                    }
+                }
+            }
+        }
+
+        List<Coach> sortedCoaches = new ArrayList<>(coachCounts.keySet());
+
+        sortedCoaches.sort(new Comparator<Coach>() {
+            @Override
+            public int compare(Coach c1, Coach c2) {
+                int count1 = coachCounts.get(c1);
+                int count2 = coachCounts.get(c2);
+
+                return count2 - count1;
+            }
+        });
+
+        return sortedCoaches;
+    }
+
+
 }
+

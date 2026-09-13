@@ -100,5 +100,75 @@ public class TimetableTest {
                 "В понедельник в 14:00 расписание должно быть пустым");
 
     }
+    @Test
+    void testGetCoachActivityWhenOneCoachIsMoreActive() {
+        Timetable timetable = new Timetable();
+
+        Group firstGroup = new Group("Акробатика для детей", Age.CHILD, 60);
+        Group secondGroup = new Group("Рукопашный бой", Age.ADULT, 60);
+        Group thirdGroup = new Group("Миксфайт", Age.ADULT, 60);
+        Coach firstCoach = new Coach("Рамов", "Андрей", "Николаевич");
+        Coach secondCoach = new Coach("Кубарев", "Алексей", "Константинович");
+        TrainingSession firstSingleTrainingSession = new TrainingSession(secondGroup, firstCoach,
+                DayOfWeek.TUESDAY, new TimeOfDay(14, 0));
+        TrainingSession secondSingleTrainingSession = new TrainingSession(firstGroup, firstCoach,
+                DayOfWeek.MONDAY, new TimeOfDay(11, 0));
+        TrainingSession thirdSingleTrainingSession = new TrainingSession(thirdGroup, secondCoach,
+                DayOfWeek.WEDNESDAY, new TimeOfDay(10, 0));
+
+        timetable.addNewTrainingSession(firstSingleTrainingSession);
+        timetable.addNewTrainingSession(secondSingleTrainingSession);
+        timetable.addNewTrainingSession(thirdSingleTrainingSession);
+
+        List<Coach> activeCoaches = timetable.getCoachActivity();
+
+        assertEquals(2, activeCoaches.size(), "В рейтинге должно быть 2 тренера");
+        assertEquals(firstCoach, activeCoaches.get(0), "Первым должен идти Рамов (2 занятия)");
+        assertEquals(secondCoach, activeCoaches.get(1), "Вторым должен идти Кубарев (1 занятие)");
+    }
+    @Test
+    void testGetCoachActivityWhenBothCoachesAreEqual() {
+        Timetable timetable = new Timetable();
+
+        Group firstGroup = new Group("Акробатика для детей", Age.CHILD, 60);
+        Group secondGroup = new Group("Рукопашный бой", Age.ADULT, 60);
+        Group thirdGroup = new Group("Миксфайт", Age.ADULT, 60);
+        Group fourthGroup = new Group("Бокс для малышей", Age.CHILD, 60);
+        Coach firstCoach = new Coach("Рамов", "Андрей", "Николаевич");
+        Coach secondCoach = new Coach("Кубарев", "Алексей", "Константинович");
+        TrainingSession firstSingleTrainingSession = new TrainingSession(secondGroup, firstCoach,
+                DayOfWeek.TUESDAY, new TimeOfDay(14, 0));
+        TrainingSession secondSingleTrainingSession = new TrainingSession(firstGroup, firstCoach,
+                DayOfWeek.MONDAY, new TimeOfDay(11, 0));
+        TrainingSession thirdSingleTrainingSession = new TrainingSession(thirdGroup, secondCoach,
+                DayOfWeek.WEDNESDAY, new TimeOfDay(10, 0));
+        TrainingSession fourthSingleTrainingSession = new TrainingSession(fourthGroup, secondCoach,
+                DayOfWeek.SATURDAY, new TimeOfDay(9, 0));
+
+
+        timetable.addNewTrainingSession(firstSingleTrainingSession);
+        timetable.addNewTrainingSession(secondSingleTrainingSession);
+        timetable.addNewTrainingSession(thirdSingleTrainingSession);
+        timetable.addNewTrainingSession(fourthSingleTrainingSession);
+
+        List<Coach> activeCoaches = timetable.getCoachActivity();
+
+
+        assertEquals(2, activeCoaches.size(),
+                "При равной активности в списке должно быть ровно 2 тренера");
+        assertTrue(activeCoaches.contains(firstCoach),
+                "Список должен содержать тренера Рамова");
+        assertTrue(activeCoaches.contains(secondCoach),
+                "Список должен содержать тренера Кубарева");
+    }
+    @Test
+    void testGetCoachActivityWhenTimetableIsEmpty() {
+        Timetable timetable = new Timetable();
+        List<Coach> activeCoaches = timetable.getCoachActivity();
+
+        Assertions.assertTrue(activeCoaches.isEmpty(),
+                "Для пустого расписания список активности должен быть пустым");
+    }
+
 
 }
