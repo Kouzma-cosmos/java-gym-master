@@ -31,7 +31,7 @@ public class Timetable {
         }
 
         currentSessions.add(trainingSession);
-        System.out.println("Тренировка успешно добавлена");
+        System.out.println("Тренировку успешно добавили");
     }
 
     public Collection<List<TrainingSession>> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
